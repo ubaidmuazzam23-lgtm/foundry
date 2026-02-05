@@ -1,0 +1,34 @@
+{
+  "mandatory_idea_schema": {
+    "problem": {
+      "type": "string",
+      "required": true,
+      "description": "The problem the startup solves"
+    },
+    "solution": {
+      "type": "string",
+      "required": true,
+      "description": "The proposed solution"
+    },
+    "target_market": {
+      "type": "string",
+      "required": true,
+      "description": "Target customer segment"
+    },
+    "unique_value_proposition": {
+      "type": "string",
+      "required": true,
+      "description": "What makes this solution unique"
+    },
+    "revenue_model": {
+      "type": "string",
+      "required": false,
+      "description": "How the startup will make money"
+    },
+    "market_size": {
+      "type": "string",
+      "required": false,
+      "description": "Estimated market size"
+    }
+  }
+}
