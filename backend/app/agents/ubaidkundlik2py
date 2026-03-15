@@ -1,0 +1,1002 @@
+# # File: backend/app/agents/competitor_intelligence_ultimate.py
+# # ULTIMATE COMPETITOR INTELLIGENCE AGENT
+# # Extracts EVERYTHING from competitors: pricing, features, tech stack, team, reviews, etc.
+
+# from typing import Dict, Any, List
+# import os
+# import requests
+# from bs4 import BeautifulSoup
+# import json
+# import re
+# from dotenv import load_dotenv
+# from groq import Groq
+# from app.utils.logger import logger
+
+# from app.services.enhanced_web_search import EnhancedWebSearchService
+# from app.services.competitor_scraper import CompetitorPricingScraper
+# from app.services.crunchbase_service import CrunchbaseService
+# from app.services.enhanced_review_scraper import EnhancedReviewScraper
+# from app.db.session import get_db
+
+# load_dotenv()
+
+
+# class UltimateCompetitorIntelligence:
+#     """
+#     ULTIMATE COMPETITOR INTELLIGENCE AGENT
+    
+#     Extracts 100% of competitor data:
+#     - Website: Features, pricing, tech stack, copy, CTAs
+#     - Team: Founders, employees, hiring, LinkedIn
+#     - Product: Screenshots, features, integrations, API
+#     - Business: Revenue, funding, customers, growth
+#     - Marketing: SEO, ads, content, social media
+#     - Reviews: G2, Capterra, TrustRadius, AppStore, PlayStore
+#     - Technology: Stack, infrastructure, dependencies
+#     - Strategy: Positioning, messaging, target market
+#     """
+    
+#     def __init__(self):
+#         api_key = os.getenv('GROQ_API_KEY')
+#         if not api_key:
+#             raise ValueError("GROQ_API_KEY not found")
+        
+#         self.client = Groq(api_key=api_key)
+#         self.web_search = EnhancedWebSearchService()
+#         self.competitor_scraper = CompetitorPricingScraper()
+#         self.crunchbase = CrunchbaseService()
+#         self.review_scraper = EnhancedReviewScraper()
+        
+#         self.headers = {
+#             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+#         }
+        
+#         logger.info("🚀 ULTIMATE Competitor Intelligence initialized")
+    
+#     def extract_complete_intelligence(self, competitor_name: str, competitor_url: str = None) -> Dict[str, Any]:
+#         """
+#         Extract EVERYTHING about a competitor.
+        
+#         Returns complete intelligence package with 15+ categories.
+#         """
+#         logger.info("=" * 80)
+#         logger.info(f"🎯 EXTRACTING COMPLETE INTELLIGENCE: {competitor_name}")
+#         logger.info("=" * 80)
+        
+#         intelligence = {
+#             'competitor_name': competitor_name,
+#             'competitor_url': competitor_url,
+#             'extraction_timestamp': None,
+            
+#             # 1. Website & Product Intelligence
+#             'website_intelligence': {},
+#             'product_features': {},
+#             'pricing_intelligence': {},
+#             'technology_stack': {},
+            
+#             # 2. Business Intelligence
+#             'company_info': {},
+#             'funding_data': {},
+#             'revenue_estimates': {},
+#             'customer_data': {},
+            
+#             # 3. Team Intelligence
+#             'team_info': {},
+#             'hiring_intelligence': {},
+#             'founders': {},
+            
+#             # 4. Marketing Intelligence
+#             'seo_analysis': {},
+#             'content_strategy': {},
+#             'advertising': {},
+#             'social_media': {},
+            
+#             # 5. Customer Intelligence
+#             'reviews_analysis': {},
+#             'customer_complaints': {},
+#             'feature_requests': {},
+#             'churn_signals': {},
+            
+#             # 6. Strategic Intelligence
+#             'positioning': {},
+#             'messaging': {},
+#             'target_market': {},
+#             'go_to_market': {},
+            
+#             # 7. Competitive Gaps
+#             'weaknesses': [],
+#             'opportunities_for_you': [],
+#             'switching_triggers': []
+#         }
+        
+#         # PHASE 1: Website & Product Intelligence
+#         logger.info("📊 PHASE 1: Website & Product Intelligence")
+#         intelligence['website_intelligence'] = self._extract_website_intelligence(competitor_name, competitor_url)
+#         intelligence['product_features'] = self._extract_product_features(competitor_name, competitor_url)
+#         intelligence['pricing_intelligence'] = self._extract_pricing_intelligence(competitor_name, competitor_url)
+#         intelligence['technology_stack'] = self._extract_tech_stack(competitor_url)
+        
+#         # PHASE 2: Business Intelligence
+#         logger.info("💼 PHASE 2: Business Intelligence")
+#         intelligence['company_info'] = self._extract_company_info(competitor_name)
+#         intelligence['funding_data'] = self._extract_funding_data(competitor_name)
+#         intelligence['revenue_estimates'] = self._estimate_revenue(competitor_name)
+#         intelligence['customer_data'] = self._extract_customer_data(competitor_name)
+        
+#         # PHASE 3: Team Intelligence
+#         logger.info("👥 PHASE 3: Team Intelligence")
+#         intelligence['team_info'] = self._extract_team_info(competitor_name)
+#         intelligence['hiring_intelligence'] = self._extract_hiring_signals(competitor_name)
+#         intelligence['founders'] = self._extract_founder_info(competitor_name)
+        
+#         # PHASE 4: Marketing Intelligence
+#         logger.info("📢 PHASE 4: Marketing Intelligence")
+#         intelligence['seo_analysis'] = self._analyze_seo(competitor_name, competitor_url)
+#         intelligence['content_strategy'] = self._analyze_content_strategy(competitor_name)
+#         intelligence['advertising'] = self._detect_advertising(competitor_name)
+#         intelligence['social_media'] = self._analyze_social_media(competitor_name)
+        
+#         # PHASE 5: Customer Intelligence
+#         logger.info("⭐ PHASE 5: Customer Intelligence")
+#         intelligence['reviews_analysis'] = self._deep_review_analysis(competitor_name)
+#         intelligence['customer_complaints'] = self._extract_complaints(competitor_name)
+#         intelligence['feature_requests'] = self._extract_feature_requests(competitor_name)
+#         intelligence['churn_signals'] = self._detect_churn_signals(competitor_name)
+        
+#         # PHASE 6: Strategic Intelligence (AI-powered)
+#         logger.info("🧠 PHASE 6: Strategic Intelligence (AI Analysis)")
+#         strategic = self._ai_strategic_analysis(competitor_name, intelligence)
+#         intelligence['positioning'] = strategic.get('positioning', {})
+#         intelligence['messaging'] = strategic.get('messaging', {})
+#         intelligence['target_market'] = strategic.get('target_market', {})
+        
+#         # PHASE 7: Identify Opportunities
+#         logger.info("🎯 PHASE 7: Identifying Opportunities")
+#         opportunities = self._identify_opportunities(intelligence)
+#         intelligence['weaknesses'] = opportunities.get('weaknesses', [])
+#         intelligence['opportunities_for_you'] = opportunities.get('opportunities', [])
+#         intelligence['switching_triggers'] = opportunities.get('triggers', [])
+        
+#         logger.info("=" * 80)
+#         logger.info(f"✅ COMPLETE INTELLIGENCE EXTRACTED")
+#         logger.info("=" * 80)
+        
+#         return intelligence
+    
+#     # ==========================================
+#     # PHASE 1: Website & Product Intelligence
+#     # ==========================================
+    
+#     def _extract_website_intelligence(self, name: str, url: str) -> Dict[str, Any]:
+#         """Extract everything from competitor's website."""
+#         logger.info("   🌐 Extracting website intelligence...")
+        
+#         website_data = {
+#             'homepage_copy': None,
+#             'value_proposition': None,
+#             'key_benefits': [],
+#             'call_to_actions': [],
+#             'navigation_structure': [],
+#             'page_count_estimate': 0,
+#             'blog_present': False,
+#             'documentation_present': False,
+#             'case_studies_count': 0,
+#             'meta_description': None,
+#             'screenshots_found': []
+#         }
+        
+#         if not url:
+#             # Try to find URL via search
+#             try:
+#                 results = self.web_search.search(f"{name} official website", num_results=1)
+#                 if results:
+#                     url = results[0].get('link', '')
+#             except:
+#                 pass
+        
+#         if url:
+#             try:
+#                 response = requests.get(url, headers=self.headers, timeout=10)
+#                 if response.status_code == 200:
+#                     soup = BeautifulSoup(response.content, 'html.parser')
+                    
+#                     # Extract homepage copy
+#                     website_data['homepage_copy'] = soup.get_text()[:500]
+                    
+#                     # Extract meta description
+#                     meta = soup.find('meta', attrs={'name': 'description'})
+#                     if meta:
+#                         website_data['meta_description'] = meta.get('content', '')
+                    
+#                     # Extract H1 (value prop)
+#                     h1 = soup.find('h1')
+#                     if h1:
+#                         website_data['value_proposition'] = h1.get_text().strip()
+                    
+#                     # Extract CTAs
+#                     buttons = soup.find_all('button')
+#                     links = soup.find_all('a', class_=re.compile('cta|button|btn'))
+#                     ctas = [btn.get_text().strip() for btn in (buttons + links)]
+#                     website_data['call_to_actions'] = list(set(ctas))[:10]
+                    
+#                     # Navigation structure
+#                     nav = soup.find('nav')
+#                     if nav:
+#                         nav_links = [a.get_text().strip() for a in nav.find_all('a')]
+#                         website_data['navigation_structure'] = nav_links[:15]
+                    
+#                     # Check for blog
+#                     if soup.find(string=re.compile('blog', re.I)):
+#                         website_data['blog_present'] = True
+                    
+#                     # Check for docs
+#                     if soup.find(string=re.compile('documentation|docs|api', re.I)):
+#                         website_data['documentation_present'] = True
+                    
+#                     logger.info(f"      ✅ Extracted website data from {url}")
+                
+#             except Exception as e:
+#                 logger.error(f"Website scrape error: {e}")
+        
+#         return website_data
+    
+#     def _extract_product_features(self, name: str, url: str) -> Dict[str, Any]:
+#         """Extract all product features."""
+#         logger.info("   🎯 Extracting product features...")
+        
+#         features_data = {
+#             'feature_list': [],
+#             'integrations': [],
+#             'api_available': False,
+#             'mobile_app': {'ios': False, 'android': False},
+#             'platforms_supported': [],
+#             'use_cases': [],
+#             'demo_available': False,
+#             'free_trial': False,
+#             'trial_duration': None
+#         }
+        
+#         try:
+#             # Search for features page
+#             results = self.web_search.search(f"{name} features", num_results=3)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '').lower()
+                
+#                 # Extract features from snippets
+#                 if 'features' in snippet or 'capabilities' in snippet:
+#                     features_data['feature_list'].append(snippet[:200])
+                
+#                 # Check for integrations
+#                 if 'integrat' in snippet:
+#                     features_data['integrations'].append(snippet[:100])
+                
+#                 # Check for API
+#                 if 'api' in snippet:
+#                     features_data['api_available'] = True
+                
+#                 # Check for mobile
+#                 if 'ios' in snippet or 'iphone' in snippet:
+#                     features_data['mobile_app']['ios'] = True
+#                 if 'android' in snippet:
+#                     features_data['mobile_app']['android'] = True
+                
+#                 # Check for trial
+#                 if 'free trial' in snippet or 'trial' in snippet:
+#                     features_data['free_trial'] = True
+#                     match = re.search(r'(\d+)[\s-]day', snippet)
+#                     if match:
+#                         features_data['trial_duration'] = f"{match.group(1)} days"
+            
+#             logger.info(f"      ✅ Found {len(features_data['feature_list'])} feature mentions")
+            
+#         except Exception as e:
+#             logger.error(f"Feature extraction error: {e}")
+        
+#         return features_data
+    
+#     def _extract_pricing_intelligence(self, name: str, url: str) -> Dict[str, Any]:
+#         """Deep pricing intelligence."""
+#         logger.info("   💰 Extracting pricing intelligence...")
+        
+#         pricing_data = {
+#             'pricing_model': None,  # subscription, usage-based, one-time, freemium
+#             'tiers': [],
+#             'starting_price': None,
+#             'enterprise_pricing': 'custom',
+#             'pricing_page_url': None,
+#             'discounts_available': False,
+#             'annual_discount': None,
+#             'free_tier_exists': False,
+#             'free_tier_limits': None,
+#             'price_anchoring': None,
+#             'most_popular_tier': None
+#         }
+        
+#         try:
+#             # Use existing scraper
+#             scraped_pricing = self.competitor_scraper.scrape_multiple_competitors([name])
+            
+#             if scraped_pricing and len(scraped_pricing) > 0:
+#                 pricing = scraped_pricing[0]
+                
+#                 pricing_data['pricing_page_url'] = pricing.get('pricing_url')
+                
+#                 tiers = pricing.get('pricing_tiers', [])
+#                 for tier in tiers:
+#                     pricing_data['tiers'].append({
+#                         'name': tier.get('name'),
+#                         'price': tier.get('price'),
+#                         'features': tier.get('features', [])
+#                     })
+                
+#                 # Determine model
+#                 if any('free' in str(t.get('price', '')).lower() for t in tiers):
+#                     pricing_data['free_tier_exists'] = True
+#                     pricing_data['pricing_model'] = 'freemium'
+#                 elif len(tiers) > 1:
+#                     pricing_data['pricing_model'] = 'tiered subscription'
+                
+#                 # Extract starting price
+#                 prices = []
+#                 for tier in tiers:
+#                     price_str = str(tier.get('price', '')).lower()
+#                     if price_str and 'free' not in price_str and 'custom' not in price_str:
+#                         match = re.search(r'\$?(\d+)', price_str)
+#                         if match:
+#                             prices.append(int(match.group(1)))
+                
+#                 if prices:
+#                     pricing_data['starting_price'] = f"${min(prices)}"
+                
+#                 logger.info(f"      ✅ Extracted {len(tiers)} pricing tiers")
+        
+#         except Exception as e:
+#             logger.error(f"Pricing extraction error: {e}")
+        
+#         return pricing_data
+    
+#     def _extract_tech_stack(self, url: str) -> Dict[str, Any]:
+#         """Detect competitor's technology stack."""
+#         logger.info("   🔧 Detecting technology stack...")
+        
+#         tech_stack = {
+#             'frontend_framework': None,
+#             'backend_hints': [],
+#             'hosting_provider': None,
+#             'cdn': None,
+#             'analytics': [],
+#             'chat_widget': None,
+#             'technologies_detected': []
+#         }
+        
+#         if not url:
+#             return tech_stack
+        
+#         try:
+#             response = requests.get(url, headers=self.headers, timeout=10)
+            
+#             if response.status_code == 200:
+#                 html = response.text
+#                 headers = response.headers
+                
+#                 # Detect frontend framework
+#                 if 'react' in html.lower():
+#                     tech_stack['frontend_framework'] = 'React'
+#                 elif 'vue' in html.lower():
+#                     tech_stack['frontend_framework'] = 'Vue.js'
+#                 elif 'angular' in html.lower():
+#                     tech_stack['frontend_framework'] = 'Angular'
+                
+#                 # Detect hosting
+#                 server = headers.get('Server', '')
+#                 if 'cloudflare' in server.lower():
+#                     tech_stack['cdn'] = 'Cloudflare'
+                
+#                 # Detect analytics
+#                 if 'google-analytics' in html or 'gtag' in html:
+#                     tech_stack['analytics'].append('Google Analytics')
+#                 if 'mixpanel' in html.lower():
+#                     tech_stack['analytics'].append('Mixpanel')
+#                 if 'segment' in html.lower():
+#                     tech_stack['analytics'].append('Segment')
+                
+#                 # Detect chat widget
+#                 if 'intercom' in html.lower():
+#                     tech_stack['chat_widget'] = 'Intercom'
+#                 elif 'drift' in html.lower():
+#                     tech_stack['chat_widget'] = 'Drift'
+#                 elif 'zendesk' in html.lower():
+#                     tech_stack['chat_widget'] = 'Zendesk'
+                
+#                 logger.info(f"      ✅ Detected {len(tech_stack['analytics'])} analytics tools")
+        
+#         except Exception as e:
+#             logger.error(f"Tech stack detection error: {e}")
+        
+#         return tech_stack
+    
+#     # ==========================================
+#     # PHASE 2: Business Intelligence
+#     # ==========================================
+    
+#     def _extract_company_info(self, name: str) -> Dict[str, Any]:
+#         """Extract company information."""
+#         logger.info("   🏢 Extracting company info...")
+        
+#         company_info = {
+#             'founded_year': None,
+#             'headquarters': None,
+#             'company_size': None,
+#             'legal_name': None,
+#             'public_or_private': None,
+#             'parent_company': None
+#         }
+        
+#         try:
+#             # Use Crunchbase
+#             cb_data = self.crunchbase.get_company_data(name)
+            
+#             if cb_data:
+#                 company_info['founded_year'] = cb_data.get('founded_on')
+#                 company_info['headquarters'] = cb_data.get('location')
+#                 company_info['company_size'] = cb_data.get('num_employees')
+#                 company_info['legal_name'] = cb_data.get('legal_name')
+            
+#             logger.info(f"      ✅ Extracted company info")
+        
+#         except Exception as e:
+#             logger.error(f"Company info error: {e}")
+        
+#         return company_info
+    
+#     def _extract_funding_data(self, name: str) -> Dict[str, Any]:
+#         """Extract funding data."""
+#         logger.info("   💵 Extracting funding data...")
+        
+#         funding_data = {
+#             'total_raised': None,
+#             'last_round': None,
+#             'last_round_date': None,
+#             'investors': [],
+#             'valuation': None,
+#             'funding_rounds': []
+#         }
+        
+#         try:
+#             cb_data = self.crunchbase.get_company_data(name)
+            
+#             if cb_data:
+#                 funding_data['total_raised'] = cb_data.get('total_funding')
+#                 funding_data['last_round'] = cb_data.get('last_funding_type')
+#                 funding_data['investors'] = cb_data.get('investors', [])
+#                 funding_data['valuation'] = cb_data.get('valuation')
+            
+#             logger.info(f"      ✅ Funding: {funding_data.get('total_raised', 'Unknown')}")
+        
+#         except Exception as e:
+#             logger.error(f"Funding data error: {e}")
+        
+#         return funding_data
+    
+#     def _estimate_revenue(self, name: str) -> Dict[str, Any]:
+#         """Estimate revenue using various signals."""
+#         logger.info("   📊 Estimating revenue...")
+        
+#         revenue_data = {
+#             'estimated_arr': None,
+#             'revenue_model': None,
+#             'estimation_method': None,
+#             'confidence': 'low'
+#         }
+        
+#         try:
+#             # Search for revenue info
+#             results = self.web_search.search(f"{name} revenue ARR MRR", num_results=3)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+                
+#                 # Look for revenue numbers
+#                 match = re.search(r'\$(\d+(?:\.\d+)?)\s*(M|million|B|billion)', snippet, re.I)
+#                 if match:
+#                     amount = float(match.group(1))
+#                     unit = match.group(2).lower()
+                    
+#                     if 'b' in unit:
+#                         revenue_data['estimated_arr'] = f"${amount}B"
+#                     else:
+#                         revenue_data['estimated_arr'] = f"${amount}M"
+                    
+#                     revenue_data['confidence'] = 'medium'
+#                     revenue_data['estimation_method'] = 'reported'
+#                     break
+            
+#             logger.info(f"      ✅ Est. Revenue: {revenue_data.get('estimated_arr', 'Unknown')}")
+        
+#         except Exception as e:
+#             logger.error(f"Revenue estimation error: {e}")
+        
+#         return revenue_data
+    
+#     def _extract_customer_data(self, name: str) -> Dict[str, Any]:
+#         """Extract customer data."""
+#         logger.info("   👥 Extracting customer data...")
+        
+#         customer_data = {
+#             'total_customers': None,
+#             'notable_customers': [],
+#             'customer_segments': [],
+#             'case_studies_found': 0,
+#             'testimonials_count': 0
+#         }
+        
+#         try:
+#             # Search for customer info
+#             results = self.web_search.search(f"{name} customers case studies", num_results=3)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+                
+#                 # Look for customer count
+#                 match = re.search(r'(\d+(?:,\d+)?)\s*(?:customers|users|companies)', snippet, re.I)
+#                 if match:
+#                     customer_data['total_customers'] = match.group(1)
+                
+#                 # Look for case studies
+#                 if 'case study' in snippet.lower():
+#                     customer_data['case_studies_found'] += 1
+            
+#             logger.info(f"      ✅ Customers: {customer_data.get('total_customers', 'Unknown')}")
+        
+#         except Exception as e:
+#             logger.error(f"Customer data error: {e}")
+        
+#         return customer_data
+    
+#     # ==========================================
+#     # PHASE 3: Team Intelligence
+#     # ==========================================
+    
+#     def _extract_team_info(self, name: str) -> Dict[str, Any]:
+#         """Extract team information."""
+#         logger.info("   👔 Extracting team info...")
+        
+#         team_info = {
+#             'employee_count': None,
+#             'employee_growth_rate': None,
+#             'key_roles': [],
+#             'engineering_team_size': None,
+#             'sales_team_size': None
+#         }
+        
+#         try:
+#             # Search LinkedIn
+#             results = self.web_search.search(f"{name} LinkedIn employees", num_results=2)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+                
+#                 # Extract employee count
+#                 match = re.search(r'(\d+(?:-\d+)?)\s*employees', snippet, re.I)
+#                 if match:
+#                     team_info['employee_count'] = match.group(1)
+            
+#             logger.info(f"      ✅ Team size: {team_info.get('employee_count', 'Unknown')}")
+        
+#         except Exception as e:
+#             logger.error(f"Team info error: {e}")
+        
+#         return team_info
+    
+#     def _extract_hiring_signals(self, name: str) -> Dict[str, Any]:
+#         """Detect hiring signals."""
+#         logger.info("   📢 Detecting hiring signals...")
+        
+#         hiring_data = {
+#             'currently_hiring': False,
+#             'open_positions': 0,
+#             'hiring_for_roles': [],
+#             'remote_positions': 0,
+#             'hiring_velocity': None
+#         }
+        
+#         try:
+#             results = self.web_search.search(f"{name} careers jobs hiring", num_results=2)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '').lower()
+                
+#                 if 'hiring' in snippet or 'careers' in snippet or 'jobs' in snippet:
+#                     hiring_data['currently_hiring'] = True
+                
+#                 # Count positions mentioned
+#                 match = re.search(r'(\d+)\s*(?:open\s*)?(?:positions|jobs|roles)', snippet)
+#                 if match:
+#                     hiring_data['open_positions'] = int(match.group(1))
+            
+#             logger.info(f"      ✅ Hiring: {hiring_data['currently_hiring']}, {hiring_data['open_positions']} positions")
+        
+#         except Exception as e:
+#             logger.error(f"Hiring signals error: {e}")
+        
+#         return hiring_data
+    
+#     def _extract_founder_info(self, name: str) -> Dict[str, Any]:
+#         """Extract founder information."""
+#         logger.info("   👤 Extracting founder info...")
+        
+#         founder_data = {
+#             'founders': [],
+#             'ceo': None,
+#             'founder_backgrounds': []
+#         }
+        
+#         try:
+#             results = self.web_search.search(f"{name} founder CEO", num_results=2)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+                
+#                 # Look for founder/CEO names
+#                 # This is basic - would need more sophisticated NER
+#                 if 'founded by' in snippet.lower() or 'ceo' in snippet.lower():
+#                     founder_data['founder_backgrounds'].append(snippet[:200])
+            
+#             logger.info(f"      ✅ Found {len(founder_data['founder_backgrounds'])} founder mentions")
+        
+#         except Exception as e:
+#             logger.error(f"Founder info error: {e}")
+        
+#         return founder_data
+    
+#     # ==========================================
+#     # PHASE 4: Marketing Intelligence
+#     # ==========================================
+    
+#     def _analyze_seo(self, name: str, url: str) -> Dict[str, Any]:
+#         """Analyze SEO strategy."""
+#         logger.info("   🔍 Analyzing SEO...")
+        
+#         seo_data = {
+#             'estimated_organic_traffic': None,
+#             'top_keywords': [],
+#             'backlinks_estimate': None,
+#             'domain_authority_estimate': None,
+#             'blog_post_frequency': None
+#         }
+        
+#         # This would require third-party APIs (Ahrefs, SEMrush)
+#         # For now, basic analysis
+        
+#         try:
+#             results = self.web_search.search(f"site:{url}", num_results=10)
+#             seo_data['indexed_pages_sample'] = len(results)
+            
+#             logger.info(f"      ✅ SEO analysis complete")
+        
+#         except Exception as e:
+#             logger.error(f"SEO analysis error: {e}")
+        
+#         return seo_data
+    
+#     def _analyze_content_strategy(self, name: str) -> Dict[str, Any]:
+#         """Analyze content marketing strategy."""
+#         logger.info("   📝 Analyzing content strategy...")
+        
+#         content_data = {
+#             'blog_present': False,
+#             'post_frequency': None,
+#             'content_topics': [],
+#             'ebooks_whitepapers': [],
+#             'webinars': False,
+#             'podcast': False
+#         }
+        
+#         try:
+#             results = self.web_search.search(f"{name} blog", num_results=2)
+            
+#             if results:
+#                 content_data['blog_present'] = True
+            
+#             logger.info(f"      ✅ Content strategy analyzed")
+        
+#         except Exception as e:
+#             logger.error(f"Content strategy error: {e}")
+        
+#         return content_data
+    
+#     def _detect_advertising(self, name: str) -> Dict[str, Any]:
+#         """Detect advertising presence."""
+#         logger.info("   📢 Detecting advertising...")
+        
+#         ad_data = {
+#             'google_ads_detected': False,
+#             'facebook_ads_detected': False,
+#             'linkedin_ads_detected': False,
+#             'display_ads_detected': False,
+#             'sponsored_content': []
+#         }
+        
+#         # Would need ad intelligence APIs
+#         # Basic detection via search
+        
+#         try:
+#             results = self.web_search.search(f"{name}", num_results=1)
+            
+#             # Check if result is an ad
+#             if results and results[0].get('is_ad'):
+#                 ad_data['google_ads_detected'] = True
+            
+#             logger.info(f"      ✅ Advertising detection complete")
+        
+#         except Exception as e:
+#             logger.error(f"Advertising detection error: {e}")
+        
+#         return ad_data
+    
+#     def _analyze_social_media(self, name: str) -> Dict[str, Any]:
+#         """Analyze social media presence."""
+#         logger.info("   📱 Analyzing social media...")
+        
+#         social_data = {
+#             'twitter': {'handle': None, 'followers': None},
+#             'linkedin': {'followers': None},
+#             'facebook': {'followers': None},
+#             'instagram': {'handle': None},
+#             'youtube': {'subscribers': None},
+#             'social_engagement': 'low'
+#         }
+        
+#         try:
+#             # Search for social profiles
+#             results = self.web_search.search(f"{name} Twitter LinkedIn Facebook", num_results=3)
+            
+#             for result in results:
+#                 url = result.get('link', '').lower()
+                
+#                 if 'twitter.com' in url:
+#                     social_data['twitter']['handle'] = url.split('/')[-1]
+#                 elif 'linkedin.com' in url:
+#                     social_data['linkedin']['url'] = url
+#                 elif 'facebook.com' in url:
+#                     social_data['facebook']['url'] = url
+            
+#             logger.info(f"      ✅ Social media analyzed")
+        
+#         except Exception as e:
+#             logger.error(f"Social media error: {e}")
+        
+#         return social_data
+    
+#     # ==========================================
+#     # PHASE 5: Customer Intelligence
+#     # ==========================================
+    
+#     def _deep_review_analysis(self, name: str) -> Dict[str, Any]:
+#         """Deep review analysis across all platforms."""
+#         logger.info("   ⭐ Deep review analysis...")
+        
+#         try:
+#             reviews = self.review_scraper.scrape_reviews_via_search(name)
+            
+#             logger.info(f"      ✅ Analyzed {reviews.get('total_reviews', 0)} reviews")
+            
+#             return reviews
+        
+#         except Exception as e:
+#             logger.error(f"Review analysis error: {e}")
+#             return {}
+    
+#     def _extract_complaints(self, name: str) -> List[Dict]:
+#         """Extract customer complaints."""
+#         logger.info("   😞 Extracting complaints...")
+        
+#         complaints = []
+        
+#         try:
+#             results = self.web_search.search(f"{name} complaints problems issues", num_results=5)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+#                 if any(word in snippet.lower() for word in ['complaint', 'problem', 'issue', 'bug', 'frustrat']):
+#                     complaints.append({
+#                         'source': result.get('title', ''),
+#                         'complaint': snippet[:200]
+#                     })
+            
+#             logger.info(f"      ✅ Found {len(complaints)} complaint mentions")
+        
+#         except Exception as e:
+#             logger.error(f"Complaints extraction error: {e}")
+        
+#         return complaints
+    
+#     def _extract_feature_requests(self, name: str) -> List[str]:
+#         """Extract customer feature requests."""
+#         logger.info("   💡 Extracting feature requests...")
+        
+#         requests_list = []
+        
+#         try:
+#             results = self.web_search.search(f"{name} feature request wishlist", num_results=3)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '')
+#                 if 'feature' in snippet.lower() or 'wish' in snippet.lower():
+#                     requests_list.append(snippet[:150])
+            
+#             logger.info(f"      ✅ Found {len(requests_list)} feature request mentions")
+        
+#         except Exception as e:
+#             logger.error(f"Feature requests error: {e}")
+        
+#         return requests_list
+    
+#     def _detect_churn_signals(self, name: str) -> Dict[str, Any]:
+#         """Detect customer churn signals."""
+#         logger.info("   🚪 Detecting churn signals...")
+        
+#         churn_data = {
+#             'switching_mentions': 0,
+#             'cancellation_mentions': 0,
+#             'alternatives_searches': [],
+#             'churn_risk': 'unknown'
+#         }
+        
+#         try:
+#             results = self.web_search.search(f"{name} alternative switch cancel", num_results=3)
+            
+#             for result in results:
+#                 snippet = result.get('snippet', '').lower()
+                
+#                 if 'switch' in snippet:
+#                     churn_data['switching_mentions'] += 1
+#                 if 'cancel' in snippet:
+#                     churn_data['cancellation_mentions'] += 1
+#                 if 'alternative' in snippet:
+#                     churn_data['alternatives_searches'].append(result.get('title', ''))
+            
+#             # Assess churn risk
+#             total_signals = churn_data['switching_mentions'] + churn_data['cancellation_mentions']
+#             if total_signals > 5:
+#                 churn_data['churn_risk'] = 'high'
+#             elif total_signals > 2:
+#                 churn_data['churn_risk'] = 'medium'
+#             else:
+#                 churn_data['churn_risk'] = 'low'
+            
+#             logger.info(f"      ✅ Churn risk: {churn_data['churn_risk']}")
+        
+#         except Exception as e:
+#             logger.error(f"Churn detection error: {e}")
+        
+#         return churn_data
+    
+#     # ==========================================
+#     # PHASE 6: AI Strategic Analysis
+#     # ==========================================
+    
+#     def _ai_strategic_analysis(self, name: str, intelligence: Dict) -> Dict[str, Any]:
+#         """AI analyzes all data to extract strategic insights."""
+#         logger.info("   🧠 AI strategic analysis...")
+        
+#         # Build comprehensive prompt with ALL intelligence
+#         context = json.dumps(intelligence, indent=2)[:10000]  # Limit size
+        
+#         prompt = f"""Analyze this competitor intelligence and extract strategic insights.
+
+# COMPETITOR: {name}
+
+# INTELLIGENCE GATHERED:
+# {context}
+
+# Extract:
+# 1. Positioning: How they position themselves in market
+# 2. Messaging: Key messages they use
+# 3. Target Market: Who they're targeting
+
+# Respond with JSON:
+# {{
+#   "positioning": {{
+#     "category": "What category they claim",
+#     "differentiation": "How they differentiate",
+#     "target_segment": "Primary target"
+#   }},
+#   "messaging": {{
+#     "value_prop": "Main value proposition",
+#     "key_benefits": ["Benefit 1", "Benefit 2"],
+#     "messaging_themes": ["Theme 1"]
+#   }},
+#   "target_market": {{
+#     "primary_segment": "Who they target",
+#     "secondary_segments": ["Segment 2"],
+#     "market_size_focus": "SMB|Mid-market|Enterprise"
+#   }}
+# }}
+
+# JSON:"""
+        
+#         try:
+#             response = self.client.chat.completions.create(
+#                 model="llama-3.3-70b-versatile",
+#                 messages=[{"role": "user", "content": prompt}],
+#                 temperature=0.2,
+#                 max_tokens=1000
+#             )
+            
+#             response_text = response.choices[0].message.content.strip()
+            
+#             # Parse JSON
+#             if response_text.startswith('```'):
+#                 response_text = response_text.split('```')[1]
+#                 if response_text.startswith('json'):
+#                     response_text = response_text[4:]
+            
+#             strategic = json.loads(response_text.strip())
+            
+#             logger.info(f"      ✅ Strategic analysis complete")
+            
+#             return strategic
+        
+#         except Exception as e:
+#             logger.error(f"AI strategic analysis error: {e}")
+#             return {}
+    
+#     # ==========================================
+#     # PHASE 7: Identify Opportunities
+#     # ==========================================
+    
+#     def _identify_opportunities(self, intelligence: Dict) -> Dict[str, Any]:
+#         """Identify weaknesses and opportunities based on ALL intelligence."""
+#         logger.info("   🎯 Identifying opportunities...")
+        
+#         opportunities = {
+#             'weaknesses': [],
+#             'opportunities': [],
+#             'triggers': []
+#         }
+        
+#         # Analyze pricing
+#         pricing = intelligence.get('pricing_intelligence', {})
+#         if pricing.get('starting_price'):
+#             price_str = pricing['starting_price']
+#             match = re.search(r'\$(\d+)', price_str)
+#             if match and int(match.group(1)) > 100:
+#                 opportunities['weaknesses'].append("High pricing - starting at " + price_str)
+#                 opportunities['opportunities'].append("Undercut on price - offer budget-friendly tier")
+        
+#         # Analyze complaints
+#         complaints = intelligence.get('customer_complaints', [])
+#         if complaints:
+#             top_complaint = complaints[0].get('complaint', '') if complaints else ''
+#             if top_complaint:
+#                 opportunities['weaknesses'].append(f"Customer complaint: {top_complaint[:100]}")
+#                 opportunities['opportunities'].append("Address this pain point in your product")
+        
+#         # Analyze features
+#         features = intelligence.get('product_features', {})
+#         if not features.get('api_available'):
+#             opportunities['weaknesses'].append("No API available")
+#             opportunities['opportunities'].append("Build robust API from day 1")
+        
+#         if not features.get('mobile_app', {}).get('ios'):
+#             opportunities['weaknesses'].append("No iOS app")
+#             opportunities['opportunities'].append("Launch mobile-first with iOS app")
+        
+#         # Analyze churn
+#         churn = intelligence.get('churn_signals', {})
+#         if churn.get('churn_risk') in ['high', 'medium']:
+#             opportunities['triggers'].append("Customers actively looking for alternatives")
+#             opportunities['opportunities'].append("Target their churning customers with migration offer")
+        
+#         # Analyze tech stack
+#         tech = intelligence.get('technology_stack', {})
+#         if not tech.get('chat_widget'):
+#             opportunities['weaknesses'].append("No live chat support")
+#             opportunities['opportunities'].append("Offer superior customer support with live chat")
+        
+#         logger.info(f"      ✅ Found {len(opportunities['weaknesses'])} weaknesses")
+#         logger.info(f"      ✅ Found {len(opportunities['opportunities'])} opportunities")
+        
+#         return opportunities

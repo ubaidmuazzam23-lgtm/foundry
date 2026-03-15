@@ -1,62 +1,72 @@
-# Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+# Backend Requirements
+# Install with: pip install -r requirements.txt
+
+# FastAPI and server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# File upload support - CRITICAL
+python-multipart>=0.0.6
+
+# OpenAI (for Whisper STT and future GPT usage)
+openai>=1.0.0
+
+# Anthropic (for Claude)
+anthropic>=0.7.0
+
+# Data validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Environment variables
+python-dotenv>=1.0.0
 
 # Database
-sqlalchemy==2.0.25
-alembic==1.13.1
-psycopg2-binary==2.9.9
-asyncpg==0.29.0
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+psycopg2-binary>=2.9.0  # PostgreSQL driver
 
-# MongoDB (Alternative)
-motor==3.3.2
-pymongo==4.6.1
+# Alternative: MongoDB
+# motor>=3.3.0
+# pymongo>=4.5.0
 
-# Authentication
-pyclerk==0.1.8
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+# Vector database (FAISS for RAG)
+faiss-cpu>=1.7.4
+# OR for GPU support:
+# faiss-gpu>=1.7.4
 
-# AI/ML
-anthropic==0.21.3
-openai==1.12.0
-tiktoken==0.6.0
+# Embeddings and NLP
+sentence-transformers>=2.2.0
+tiktoken>=0.5.0  # Token counting for LLMs
 
-# Vector Database
-faiss-cpu==1.7.4
-sentence-transformers==2.3.1
+# HTTP client
+httpx>=0.25.0
+requests>=2.31.0
 
-# Audio Processing
-openai-whisper==20231117
-pydub==0.25.1
-soundfile==0.12.1
+# Clerk authentication
+pyclerk>=0.0.5
 
-# Data Validation
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# WebSocket support
+websockets>=12.0
 
 # Utilities
-python-dotenv==1.0.0
-tenacity==8.2.3
-httpx==0.26.0
-aiofiles==23.2.1
+python-jose[cryptography]>=3.3.0  # JWT handling
+passlib[bcrypt]>=1.7.4  # Password hashing (if needed)
+python-dateutil>=2.8.2
 
-# Monitoring & Logging
-loguru==0.7.2
-prometheus-client==0.19.0
+# Logging and monitoring
+python-json-logger>=2.0.7
 
-# WebSockets
-websockets==12.0
+# Audio processing (optional, for format conversion)
+# pydub>=0.25.1
+# ffmpeg-python>=0.2.0
 
-# Testing
-pytest==7.4.4
-pytest-asyncio==0.23.3
-pytest-cov==4.1.0
-httpx==0.26.0
+# Testing (development)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0  # For TestClient
 
-# Code Quality
-black==24.1.1
-flake8==7.0.0
-mypy==1.8.0
-isort==5.13.2
+# Code quality (development)
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0

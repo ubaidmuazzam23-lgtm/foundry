@@ -1,0 +1,19 @@
+name,valuation_b,industry,country,founded,funding_total_usd,status,category
+ByteDance,140.0,AI/Media,China,2012,42000000000,operating,AI/Media
+SpaceX,137.0,Aerospace,USA,2002,41100000000,operating,Aerospace
+Stripe,50.0,Fintech,USA,2010,15000000000,operating,Fintech
+Klarna,45.6,Fintech,Sweden,2005,13680000000,operating,Fintech
+Canva,40.0,Design,Australia,2012,12000000000,operating,Design
+Databricks,38.0,Data,USA,2013,11400000000,operating,Data
+Revolut,33.0,Fintech,UK,2015,9900000000,operating,Fintech
+Nubank,30.0,Fintech,Brazil,2013,9000000000,operating,Fintech
+Checkout.com,40.0,Fintech,UK,2012,12000000000,operating,Fintech
+Instacart,39.0,Delivery,USA,2012,11700000000,operating,Delivery
+Epic Games,31.5,Gaming,USA,1991,9450000000,operating,Gaming
+Chime,25.0,Fintech,USA,2013,7500000000,operating,Fintech
+Discord,15.0,Social,USA,2015,4500000000,operating,Social
+Fanatics,27.0,E-commerce,USA,1995,8100000000,operating,E-commerce
+Figma,20.0,Design,USA,2012,6000000000,operating,Design
+Notion,10.0,Productivity,USA,2013,3000000000,operating,Productivity
+Plaid,13.4,Fintech,USA,2013,4020000000,operating,Fintech
+Miro,17.5,SaaS,USA,2011,5250000000,operating,SaaS

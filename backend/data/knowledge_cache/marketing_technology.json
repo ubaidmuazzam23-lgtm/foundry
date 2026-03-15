@@ -1,0 +1,23 @@
+{
+  "industry": "marketing technology",
+  "documents_indexed": 15,
+  "sources": [
+    "Government - Bureau of Labor Statistics",
+    "Company Data",
+    "Industry News",
+    "Government - US Census",
+    "Market Research",
+    "Academic Research"
+  ],
+  "coverage": "good",
+  "last_updated": "2026-03-02T23:13:58.007081",
+  "build_time_seconds": 17,
+  "categories": {
+    "wikipedia": 0,
+    "market_reports": 4,
+    "news": 3,
+    "company_data": 4,
+    "government": 2,
+    "research": 2
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "created": "2026-02-27T23:37:19.342429",
+  "total_companies": 76,
+  "failures": 28,
+  "successes": 48,
+  "sources": [
+    "Documented startup failures",
+    "CB Insights unicorn valuations"
+  ],
+  "features": [
+    "funding_millions",
+    "company_age",
+    "monthly_burn_millions",
+    "competitors_count",
+    "market_validation_score",
+    "team_quality_score",
+    "ltv_cac_ratio"
+  ]
+}

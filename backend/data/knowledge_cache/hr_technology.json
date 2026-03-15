@@ -1,0 +1,19 @@
+{
+  "industry": "hr technology",
+  "documents_indexed": 2,
+  "sources": [
+    "Government - Bureau of Labor Statistics",
+    "Government - US Census"
+  ],
+  "coverage": "basic",
+  "last_updated": "2026-02-15T16:51:08.433022",
+  "build_time_seconds": 3,
+  "categories": {
+    "wikipedia": 0,
+    "market_reports": 0,
+    "news": 0,
+    "company_data": 0,
+    "government": 2,
+    "research": 0
+  }
+}
