@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.Python
+venv/
+env/
+.venv/
+
+# Environment variables — NEVER commit
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Logs
+*.log
