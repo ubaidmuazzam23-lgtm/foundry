@@ -51,7 +51,7 @@ loguru==0.7.2
 tenacity==8.2.3
 aiofiles==23.2.1
 aiohttp==3.13.3
-tiktoken==0.5.2
+
 PyPDF2==3.0.1
 reportlab==4.4.10
 python-slugify==8.0.4
