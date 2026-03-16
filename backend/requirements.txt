@@ -1,13 +1,13 @@
 # Core API
-fastapi==0.109.0
-uvicorn==0.27.0
-python-multipart==0.0.6
-starlette==0.35.1
+fastapi==0.115.6
+uvicorn==0.34.0
+python-multipart==0.0.20
+starlette==0.41.3
 
 # Database
-SQLAlchemy==2.0.25
-alembic==1.13.1
-psycopg2-binary==2.9.9
+SQLAlchemy==2.0.40
+alembic==1.14.1
+psycopg2-binary==2.9.10
 
 
 # Auth
